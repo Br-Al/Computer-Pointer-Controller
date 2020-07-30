@@ -40,8 +40,8 @@ class InputFeeder:
         '''
         while True:
             for _ in range(10):
-                _, frame=self.cap.read()
-            yield frame
+                flag, frame=self.cap.read()
+            yield flag, frame
 
 
     def close(self):

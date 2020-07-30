@@ -1,7 +1,7 @@
 from openvino.inference_engine import IECore
 import cv2
 import numpy as np
-
+import logging as log
 
 class Generic:
     '''
@@ -54,7 +54,7 @@ class Generic:
         supported_layers = self.core.query_network(network=self.model, device_name=self.device)
         unsupported_layers = [l for l in self.model.layers.keys() if l not in supported_layers]
         if len(unsupported_layers) != 0:
-            print("Unsupported layers found for the given device ({}):\n {}".format(self.device, unsupported_layers))
+            log.info("Unsupported layers found for the given device ({}):\n {}".format(self.device, unsupported_layers))
             if 'CPU' in self.device and self.extensions:
                 self.core.add_extension(self.extensions, self.device)
 

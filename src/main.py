@@ -12,6 +12,7 @@ import cv2
 import numpy as np
 import math
 import time
+import logging as log
 
 # Default Models, by defauld all models use the FP32 precission
 
@@ -69,12 +70,12 @@ def main(args):
     start = time.time()
     gaze_estimator = GazeEstimator(args.model_ge, args.device_ge, args.ext_ge)
     ge_load_time = time.time() - start 
-    print("Loading...")
-    print("Face detection time       :{:.4f}ms".format(fd_load_time))    
-    print("Landmarks estimation time :{:.4f}ms".format(ld_load_time))     
-    print("Head pose estimation time :{:.4f}ms".format(hpe_load_time))     
-    print("Gaze estimation time      :{:.4f}ms".format(ge_load_time))  
-    print('Loaded')
+    log.info("Models Loading...")
+    log.info("Face detection load time       :{:.4f}ms".format(fd_load_time))    
+    log.info("Landmarks estimation load time :{:.4f}ms".format(ld_load_time))     
+    log.info("Head pose estimation load time :{:.4f}ms".format(hpe_load_time))     
+    log.info("Gaze estimation load time      :{:.4f}ms".format(ge_load_time))  
+    log.info('All Models loaded')
     mouse_controller = MouseController('high', 'fast')
 
 
@@ -92,8 +93,11 @@ def main(args):
 
     counter = 0
 
-    for frame in input_feeder.next_batch():
+    for flag, frame in input_feeder.next_batch():
         
+        if not flag:
+            break
+
         counter +=1
 
         key = cv2.waitKey(60)
@@ -129,10 +133,10 @@ def main(args):
             ge_infer_time += time.time() - start
   
 
-            print("Face detection time       :{:.4f}ms".format(fd_infer_time/counter))    
-            print("Landmarks estimation time :{:.4f}ms".format(ld_infer_time/counter))     
-            print("Head pose estimation time :{:.4f}ms".format(hpe_infer_time/counter))     
-            print("Gaze estimation time      :{:.4f}ms".format(ge_infer_time/counter))     
+            log.info("Face detection time       :{:.4f}ms".format(fd_infer_time/counter))    
+            log.info("Landmarks estimation time :{:.4f}ms".format(ld_infer_time/counter))     
+            log.info("Head pose estimation time :{:.4f}ms".format(hpe_infer_time/counter))     
+            log.info("Gaze estimation time      :{:.4f}ms".format(ge_infer_time/counter))     
 
             if args.input != 0:
                 drawer = Drawer(face, real_landmraks, head_pose_angles, gaze)
@@ -150,7 +154,7 @@ def main(args):
             mouse_controller.move(mouse_x, mouse_y)
 
         except Exception as e:
-            print(e)
+            log.error(e)
         finally:
             if key == 27:
                 break
